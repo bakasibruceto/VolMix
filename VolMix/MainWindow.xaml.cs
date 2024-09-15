@@ -15,10 +15,6 @@ namespace VolMix
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    /// 
-   
-
-
     public partial class MainWindow : Window
     {
         public MainWindow()
@@ -62,7 +58,6 @@ namespace VolMix
             }
         }
 
-
         private void RemoveButton_Click(object sender, RoutedEventArgs e)
         {
             // Show the custom confirmation dialog with the main window as the owner
@@ -72,7 +67,11 @@ namespace VolMix
             if (result)
             {
                 // Logic to handle the remove action
-                MessageBox.Show("Item removed!");
+                if (sender is Button removeButton && removeButton.Tag is Grid mixContainer)
+                {
+                    MixerContainer.Children.Remove(mixContainer);
+                    MessageBox.Show("Item removed!");
+                }
             }
             else
             {
@@ -88,9 +87,10 @@ namespace VolMix
             {
                 Width = 75,
                 VerticalAlignment = VerticalAlignment.Top,
-                Margin = new Thickness(0), // Adjusted margin
-                Height = 282,
-                HorizontalAlignment = HorizontalAlignment.Left
+                Margin = new Thickness(0),
+                Height = 327,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                AllowDrop = true
             };
 
             // Add the inner elements to the new MixContainer
@@ -99,7 +99,7 @@ namespace VolMix
                 BorderBrush = Brushes.Black,
                 BorderThickness = new Thickness(1),
                 HorizontalAlignment = HorizontalAlignment.Center,
-                Height = 204,
+                Height = 179,
                 VerticalAlignment = VerticalAlignment.Top,
                 Width = 60,
                 Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF2C2F33")),
@@ -114,13 +114,17 @@ namespace VolMix
                 VerticalAlignment = VerticalAlignment.Top,
                 Width = 18,
                 Height = 150,
-                Orientation = Orientation.Vertical
+                Orientation = Orientation.Vertical,
+                Minimum = 0,
+                Maximum = 100,
+                Value = 100
             };
 
             sliderBorder.Child = slider;
 
             Border labelBorder = new Border
             {
+                CornerRadius = new CornerRadius(0, 0, 5, 5),
                 BorderBrush = Brushes.Black,
                 BorderThickness = new Thickness(1),
                 HorizontalAlignment = HorizontalAlignment.Center,
@@ -130,37 +134,64 @@ namespace VolMix
                 Width = 60
             };
 
-            Label volCount = new Label
+            TextBlock volCount = new TextBlock
             {
-                Content = "100%\n",
+                Text = "100%",
                 VerticalAlignment = VerticalAlignment.Top,
-                Height = 28,
+                HorizontalAlignment = HorizontalAlignment.Left,
                 Foreground = Brushes.White,
                 FontSize = 16,
-                HorizontalAlignment = HorizontalAlignment.Center,
+                TextAlignment = TextAlignment.Center,
                 Width = 50,
-                Margin = new Thickness(0, -5, 0, 0)
+                Margin = new Thickness(5, 0, 0, 0)
             };
 
             labelBorder.Child = volCount;
 
-            Border emptyBorder = new Border
+            Border imageBorder = new Border
             {
+                CornerRadius = new CornerRadius(5, 5, 0, 0),
                 BorderBrush = Brushes.Black,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(0, 7, 0, 215),
+                Margin = new Thickness(0, 7, 0, 260),
                 Width = 60,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
 
-            // Add the borders to the new MixContainer
+            Image image = new Image
+            {
+                Margin = new Thickness(9, 9, 9, 9)
+            };
+
+            imageBorder.Child = image;
+
+            Button removeButton = new Button
+            {
+                Content = "Remove",
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Top,
+                Width = 60,
+                Height = 30,
+                Margin = new Thickness(0, 280, 0, 0),
+                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF2C2F33")),
+                Foreground = Brushes.White,
+                BorderBrush = Brushes.Black,
+                BorderThickness = new Thickness(1),
+                Tag = newMixContainer // Set the Tag to the MixContainer
+            };
+
+            removeButton.Click += RemoveButton_Click;
+
+            // Add the borders and button to the new MixContainer
             newMixContainer.Children.Add(sliderBorder);
             newMixContainer.Children.Add(labelBorder);
-            newMixContainer.Children.Add(emptyBorder);
+            newMixContainer.Children.Add(imageBorder);
+            newMixContainer.Children.Add(removeButton);
 
             // Add the new MixContainer to the MixerContainer
             MixerContainer.Children.Add(newMixContainer);
         }
 
+        
     }
 }

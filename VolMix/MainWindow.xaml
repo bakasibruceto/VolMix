@@ -5,14 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VolMix"
         mc:Ignorable="d"
-        Title="Volmix" Height="453" Width="543"
+        Title="Volmix" Height="368" Width="571"
         Foreground="#23272a"
         Background="Transparent"
         WindowStyle="None"
         AllowsTransparency="True"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
-
 
     <Window.Resources>
         <ResourceDictionary>
@@ -24,15 +23,11 @@
             <local:IntegerPercentageConverter x:Key="IntegerPercentageConverter"/>
             <!-- Other resources -->
 
-      
-
             <Style x:Key="ButtonStyle" TargetType="Button">
-                <Setter Property="Background" Value="#7289DA"/>
+                <Setter Property="Background" Value="#FF2C2F33"/>
                 <Setter Property="Foreground" Value="White"/>
                 <Setter Property="BorderBrush" Value="Black"/>
-                <!-- Set the border color to black -->
                 <Setter Property="BorderThickness" Value="1"/>
-                <!-- Set the border thickness -->
                 <Setter Property="FontSize" Value="14"/>
                 <Setter Property="FontWeight" Value="Bold"/>
                 <Setter Property="Padding" Value="10,5"/>
@@ -40,10 +35,10 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}" 
-                     BorderBrush="{TemplateBinding BorderBrush}" 
-                     BorderThickness="{TemplateBinding BorderThickness}" 
-                     CornerRadius="0">
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}" 
+                                    CornerRadius="7">
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <ControlTemplate.Triggers>
@@ -64,17 +59,31 @@
 
             <!-- Close Icon -->
             <Geometry x:Key="CloseIconGeometry">M 0,0 L 10,10 M 10,0 L 0,10</Geometry>
-            
-            
-            
+
+            <!-- Plus Icon -->
+            <Geometry x:Key="PlusIconGeometry">
+                M12,2c-5.51397,0 -10,4.48604 -10,10c0,5.51396 4.48603,10 10,10c5.51397,0 10,-4.48604 10,-10c0,-5.51396 -4.48603,-10 -10,-10zM12,3.5c4.70331,0 8.5,3.7967 8.5,8.5c0,4.7033 -3.79669,8.5 -8.5,8.5c-4.70331,0 -8.5,-3.7967 -8.5,-8.5c0,-4.7033 3.79669,-8.5 8.5,-8.5zM11.98828,6.99023c-0.41344,0.00647 -0.74367,0.34631 -0.73828,0.75977v3.5h-3.5c-0.27048,-0.00383 -0.52206,0.13828 -0.65842,0.3719c-0.13635,0.23362 -0.13635,0.52257 0,0.75619c0.13635,0.23362 0.38794,0.37573 0.65842,0.3719h3.5v3.5c-0.00383,0.27048 0.13828,0.52206 0.3719,0.65842c0.23362,0.13635 0.52257,0.13635 0.75619,0c0.23362,-0.13635 0.37573,-0.38794 0.3719,-0.65842v-3.5h3.5c0.27048,0.00383 0.52206,-0.13828 0.65842,-0.3719c0.13635,-0.23362 0.13635,-0.52257 0,-0.75619c-0.13635,-0.23362 -0.38794,-0.37573 -0.65842,-0.3719h-3.5v-3.5c0.00264,-0.20264 -0.07682,-0.39773 -0.22031,-0.54085c-0.14348,-0.14312 -0.33878,-0.22208 -0.54141,-0.21892z
+            </Geometry>
+            <!-- Custom Gear Icon from SVG -->
+            <Geometry x:Key="CustomGearIconGeometry">
+                M47.16,21.221l-5.91-0.966c-0.346-1.186-0.819-2.326-1.411-3.405l3.45-4.917c0.279-0.397,0.231-0.938-0.112-1.282
+                l-3.889-3.887c-0.347-0.346-0.893-0.391-1.291-0.104l-4.843,3.481c-1.089-0.602-2.239-1.08-3.432-1.427l-1.031-5.886
+                C28.607,2.35,28.192,2,27.706,2h-5.5c-0.49,0-0.908,0.355-0.987,0.839l-0.956,5.854c-1.2,0.345-2.352,0.818-3.437,1.412
+                l-4.83-3.45c-0.399-0.285-0.942-0.239-1.289,0.106L6.82,10.648c-0.343,0.343-0.391,0.883-0.112,1.28l3.399,4.863
+                c-0.605,1.095-1.087,2.254-1.438,3.46l-5.831,0.971c-0.482,0.08-0.836,0.498-0.836,0.986v5.5c0,0.485,0.348,0.9,0.825,0.985
+                l5.831,1.034c0.349,1.203,0.831,2.362,1.438,3.46l-3.441,4.813c-0.284,0.397-0.239,0.942,0.106,1.289l3.888,3.891
+                c0.343,0.343,0.884,0.391,1.281,0.112l4.87-3.411c1.093,0.601,2.248,1.078,3.445,1.424l0.976,5.861
+                C21.3,47.647,21.717,48,22.206,48h5.5c0.485,0,0.9-0.348,0.984-0.825l1.045-5.89c1.199-0.353,2.348-0.833,3.43-1.435
+                l4.905,3.441c0.398,0.281,0.938,0.232,1.282-0.111l3.888-3.891c0.346-0.347,0.391-0.894,0.104-1.292l-3.498-4.857
+                c0.593-1.08,1.064-2.222,1.407-3.408l5.918-1.039c0.479-0.084,0.827-0.5,0.827-0.985v-5.5
+                C47.999,21.718,47.644,21.3,47.16,21.221z M25,32c-3.866,0-7-3.134-7-7c0-3.866,3.134-7,7-7s7,3.134,7,7
+                C32,28.866,28.866,32,25,32z
+            </Geometry>
         </ResourceDictionary>
     </Window.Resources>
 
-
-
-    <Border Background="#23272a" CornerRadius="8" BorderThickness="1">
+    <Border Background="#23272a" CornerRadius="5" BorderThickness="1" BorderBrush="Black">
         <Grid x:Name="MainContent">
-            <!-- Custom Title Bar -->
             <!-- Custom Title Bar -->
             <Border x:Name="TitleBar" CornerRadius="5,5,0,0" Background="#2C2F33" Height="30" VerticalAlignment="Top" MouseLeftButtonDown="TitleBar_MouseDown">
                 <DockPanel>
@@ -91,11 +100,10 @@
                     </StackPanel>
                 </DockPanel>
             </Border>
-            <Grid x:Name="MixContainer" d:IsLocked="False" Width="75" VerticalAlignment="Top" Margin="22,35,0,0" Height="327" HorizontalAlignment="Left">
-                <Border BorderBrush="Black" 
-        BorderThickness="1"
-        HorizontalAlignment="Center"
-        Height="179" VerticalAlignment="Top" Width="60" Background="#FF2C2F33" Margin="0,66,0,0">
+
+            <!-- Main Content -->
+            <Grid x:Name="MixContainer" d:IsLocked="False" Width="75" VerticalAlignment="Top" Margin="10,33,0,0" Height="327" HorizontalAlignment="Left">
+                <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" Height="179" VerticalAlignment="Top" Width="60" Background="#FF2C2F33" Margin="0,66,0,0">
                     <Slider x:Name="VolumeSlider"
                             Style="{DynamicResource SliderStyle1}" 
                             HorizontalAlignment="Center" 
@@ -110,58 +118,63 @@
                 </Border>
                 <Border CornerRadius="0,0,5,5" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" Height="26" Margin="0,244,0,0" VerticalAlignment="Top" Width="60">
                     <TextBlock x:Name="volCount" 
-               Text="{Binding ElementName=VolumeSlider, Path=Value, Converter={StaticResource IntegerPercentageConverter}}" 
-               VerticalAlignment="Top" 
-               HorizontalAlignment="Left" 
-               Foreground="White" 
-               FontSize="16" 
-               TextAlignment="Center" 
-               Width="50" Margin="5,0,0,0" />
+                               Text="{Binding ElementName=VolumeSlider, Path=Value, Converter={StaticResource IntegerPercentageConverter}}" 
+                               VerticalAlignment="Top" 
+                               HorizontalAlignment="Left" 
+                               Foreground="White" 
+                               FontSize="16" 
+                               TextAlignment="Center" 
+                               Width="50" Margin="5,0,0,0" />
                 </Border>
-                <Border CornerRadius="5,5,0,0" BorderBrush="Black" BorderThickness="1" Margin="0,7,0,260" Width="60" HorizontalAlignment="Center"/>
+                <Border CornerRadius="5,5,0,0" BorderBrush="Black" BorderThickness="1" Margin="0,7,0,260" Width="60" HorizontalAlignment="Center">
+                    <Image Margin="9,9,9,9"/>
+                </Border>
 
                 <!-- Add the Remove Button -->
                 <Button Content="Remove" 
-                HorizontalAlignment="Center" 
-                VerticalAlignment="Top" 
-                Width="60" 
-                Height="30" 
-                Margin="0,280,0,0" 
-                Background="#FF2C2F33" 
-                Foreground="White" 
-                BorderBrush="Black" 
-                BorderThickness="1" 
-                Click="RemoveButton_Click"/>
-
-            <!-- Volume Mixer Container -->
+                        HorizontalAlignment="Center" 
+                        VerticalAlignment="Top" 
+                        Width="60" 
+                        Height="30" 
+                        Margin="0,280,0,0" 
+                        Background="#FF2C2F33" 
+                        Foreground="White" 
+                        BorderBrush="Black" 
+                        BorderThickness="1" 
+                        Click="RemoveButton_Click"/>
             </Grid>
-            <Border BorderBrush="Black" BorderThickness="1" Margin="122,36,17,89">
+            <Border x:Name="MixerPane" BorderBrush="Black" BorderThickness="1" Margin="96,32,21,10" CornerRadius="5">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="0,0,0,-1">
-                    <StackPanel x:Name="MixerContainer" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
-
+                    <StackPanel x:Name="MixerContainer" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" >
                     </StackPanel>
                 </ScrollViewer>
             </Border>
-            
-            <Grid x:Name="Buttons" HorizontalAlignment="Left" VerticalAlignment="Top" Width="237" Height="39" Margin="287,396,0,0">
-                <Button x:Name="settingsButton" Content="Settings" 
-                    HorizontalAlignment="Left" 
-                    VerticalAlignment="Top" 
-                    Width="108" 
-                    Height="32" 
-                    Style="{StaticResource ButtonStyle}"/>
-                <Button x:Name="addButton" Content="Add" 
-                    HorizontalAlignment="Left" 
-                    Margin="129,0,0,0" 
-                    VerticalAlignment="Top" 
-                    Width="108" 
-                    Height="32" 
-                    Click="AddButton_Click"
-                    Style="{StaticResource ButtonStyle}"/>
-            </Grid>
 
-            <!-- Main Content -->
+            <Grid x:Name="Buttons" HorizontalAlignment="Left" VerticalAlignment="Top" Width="27" Height="52" Margin="540,44,0,0">
+                <Button x:Name="addButton" 
+                        Style="{StaticResource ButtonStyle}" 
+                        Click="AddButton_Click" 
+                        ToolTip="Add" Margin="2,28,1,0">
+                    <Path Data="{StaticResource PlusIconGeometry}" Fill="White" Stretch="Uniform"
+                                Width="15" Height="15" />
+                </Button>
+                <Button x:Name="settingsButton" 
+        Style="{StaticResource ButtonStyle}" 
+        ToolTip="Settings" Margin="2,-1,1,29" RenderTransformOrigin="0.5,0.5">
+                    <Button.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="-1"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Button.RenderTransform>
+                    <Path Data="{StaticResource CustomGearIconGeometry}" 
+          Fill="White" 
+          Width="15" Height="15" 
+          Stretch="Uniform"/>
+                </Button>
+            </Grid>
         </Grid>
     </Border>
 </Window>
-
