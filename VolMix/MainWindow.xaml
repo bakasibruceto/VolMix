@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VolMix"
         mc:Ignorable="d"
-        Title="Volmix" Height="380" Width="543"
+        Title="Volmix" Height="453" Width="543"
         Foreground="#23272a"
         Background="Transparent"
         WindowStyle="None"
         AllowsTransparency="True"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="CanMinimize">
+        ResizeMode="NoResize">
 
 
     <Window.Resources>
@@ -24,61 +24,7 @@
             <local:IntegerPercentageConverter x:Key="IntegerPercentageConverter"/>
             <!-- Other resources -->
 
-            <Style x:Key="MinimizeButtonStyle" TargetType="Button">
-                <Setter Property="Background" Value="#2C2F33"/>
-                <Setter Property="Foreground" Value="White"/>
-                <Setter Property="BorderBrush" Value="Black"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="FontSize" Value="14"/>
-                <Setter Property="FontWeight" Value="Bold"/>
-                <Setter Property="Width" Value="30"/>
-                <Setter Property="Height" Value="30"/>
-                <Setter Property="Template">
-
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0" CornerRadius="0">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#7289DA"/>
-                                </Trigger>
-                                <Trigger Property="IsPressed" Value="True">
-                                    <Setter Property="Background" Value="#99AAB5"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-            <Style x:Key="CloseButtonStyle" TargetType="Button">
-                <Setter Property="Background" Value="#2C2F33"/>
-                <Setter Property="Foreground" Value="White"/>
-                <Setter Property="BorderBrush" Value="Black"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="FontSize" Value="14"/>
-                <Setter Property="FontWeight" Value="Bold"/>
-                <Setter Property="Width" Value="30"/>
-                <Setter Property="Height" Value="30"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0" CornerRadius="0,8,0,0">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#7289DA"/>
-                                </Trigger>
-                                <Trigger Property="IsPressed" Value="True">
-                                    <Setter Property="Background" Value="#99AAB5"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
+      
 
             <Style x:Key="ButtonStyle" TargetType="Button">
                 <Setter Property="Background" Value="#7289DA"/>
@@ -118,6 +64,9 @@
 
             <!-- Close Icon -->
             <Geometry x:Key="CloseIconGeometry">M 0,0 L 10,10 M 10,0 L 0,10</Geometry>
+            
+            
+            
         </ResourceDictionary>
     </Window.Resources>
 
@@ -129,7 +78,7 @@
             <!-- Custom Title Bar -->
             <Border x:Name="TitleBar" CornerRadius="5,5,0,0" Background="#2C2F33" Height="30" VerticalAlignment="Top" MouseLeftButtonDown="TitleBar_MouseDown">
                 <DockPanel>
-                    <TextBlock Text="Volmix" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="14" FontWeight="Bold"/>
+                    <TextBlock Text="VolMix" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="14" FontWeight="Bold"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Style="{StaticResource MinimizeButtonStyle}" Click="MinimizeButton_Click">
                             <Path Data="{StaticResource MinimizeIconGeometry}" Stroke="White" StrokeThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -186,7 +135,7 @@
 
             <!-- Volume Mixer Container -->
             </Grid>
-            <Border BorderBrush="Black" BorderThickness="1" Margin="122,36,17,55">
+            <Border BorderBrush="Black" BorderThickness="1" Margin="122,36,17,89">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="0,0,0,-1">
                     <StackPanel x:Name="MixerContainer" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
 
@@ -194,7 +143,7 @@
                 </ScrollViewer>
             </Border>
             
-            <Grid x:Name="Buttons" HorizontalAlignment="Left" VerticalAlignment="Top" Width="237" Height="39" Margin="285,330,0,0">
+            <Grid x:Name="Buttons" HorizontalAlignment="Left" VerticalAlignment="Top" Width="237" Height="39" Margin="287,396,0,0">
                 <Button x:Name="settingsButton" Content="Settings" 
                     HorizontalAlignment="Left" 
                     VerticalAlignment="Top" 

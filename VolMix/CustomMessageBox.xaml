@@ -1,12 +1,102 @@
 <Window x:Class="VolMix.CustomMessageBox"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Confirmation" Height="200" Width="400" WindowStartupLocation="CenterOwner" WindowStyle="None" ResizeMode="NoResize">
-    <Grid>
-        <TextBlock x:Name="MessageTextBlock" Text="Are you sure you want to remove this item?" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" Margin="20"/>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20">
-            <Button x:Name="YesButton" Content="Yes" Width="75" Margin="10" Click="YesButton_Click"/>
-            <Button x:Name="NoButton" Content="No" Width="75" Margin="10" Click="NoButton_Click"/>
-        </StackPanel>
-    </Grid>
+        Title="Confirmation" Height="150" Width="250" 
+        WindowStartupLocation="CenterOwner" 
+        WindowStyle="None" 
+        ResizeMode="NoResize"
+        Background="Transparent"
+        AllowsTransparency="True">
+
+    <Window.Resources>
+        <Style x:Key="ButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#7289DA"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                    CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#99AAB5"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#2C2F33"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="WarningButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#E74C3C"/>
+            <!-- Warning color -->
+            <Setter Property="Foreground" Value="White"/>
+  
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+              
+                    CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#C0392B"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#A93226"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border Background="#23272a" CornerRadius="10" BorderBrush="#E74C3C" BorderThickness="3">
+        <Grid>
+            <TextBlock x:Name="MessageTextBlock" 
+                       Foreground="White" Text="Are you sure you want to remove this item?" 
+                       VerticalAlignment="Top" 
+                       HorizontalAlignment="Center" 
+                       TextAlignment="Center" 
+                       TextWrapping="Wrap" 
+                       Margin="0,32,0,0" 
+                       Width="180" FontSize="16"
+                       FontWeight="Bold"/>
+            
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top" 
+                        Margin="0,83,0,0">
+                
+                <Button x:Name="YesButton" 
+                        Content="Yes" 
+                        Width="50" Height="25" 
+                        Margin="10"
+                        Click="YesButton_Click" 
+                        Style="{StaticResource WarningButtonStyle}"/>
+                
+                <Button x:Name="NoButton" 
+                        Content="No" Width="50" 
+                        Height="25" Margin="10"
+                        Click="NoButton_Click" 
+                        Style="{StaticResource ButtonStyle}"/>
+            </StackPanel>
+        </Grid>
+    </Border>
 </Window>
