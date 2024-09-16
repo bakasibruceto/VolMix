@@ -108,11 +108,11 @@ namespace VolMix
 
             Slider slider = new Slider
             {
-                Style = (Style)FindResource("SliderStyle1"),
+                Style = (Style)FindResource("CustomSliderStyle"),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Margin = new Thickness(0, 9, 0, 0),
                 VerticalAlignment = VerticalAlignment.Top,
-                Width = 18,
+                Width = 30,
                 Height = 150,
                 Orientation = Orientation.Vertical,
                 Minimum = 0,
@@ -192,6 +192,6 @@ namespace VolMix
             MixerContainer.Children.Add(newMixContainer);
         }
 
-        
+
     }
 }

@@ -21,6 +21,7 @@
             </ResourceDictionary.MergedDictionaries>
 
             <local:IntegerPercentageConverter x:Key="IntegerPercentageConverter"/>
+            <local:SliderHeightConverter x:Key="SliderHeightConverter"/>
             <!-- Other resources -->
 
             <Style x:Key="ButtonStyle" TargetType="Button">
@@ -79,6 +80,56 @@
                 C47.999,21.718,47.644,21.3,47.16,21.221z M25,32c-3.866,0-7-3.134-7-7c0-3.866,3.134-7,7-7s7,3.134,7,7
                 C32,28.866,28.866,32,25,32z
             </Geometry>
+            <ControlTemplate x:Key="CustomSliderTemplate" TargetType="Slider">
+                <Grid>
+                    <Border CornerRadius="3" Background="#F76C6E" x:Name="PART_TrackRemaining" Margin="13,0,13,0" />
+                    <Border Width="4" CornerRadius="3" Background="#57f287" x:Name="PART_TrackFilled" VerticalAlignment="Bottom" />
+                    <TickBar x:Name="TopTick" Grid.Column="0" Fill="{TemplateBinding Foreground}" Margin="0,0,2,0" Placement="Left" Visibility="Collapsed" Width="4"/>
+                    <TickBar x:Name="BottomTick" Grid.Column="2" Fill="{TemplateBinding Foreground}" Margin="2,0,0,0" Placement="Right" Visibility="Collapsed" Width="4"/>
+                    <Track x:Name="PART_Track">
+                        <Track.DecreaseRepeatButton>
+                            <RepeatButton Command="Slider.DecreaseLarge" Style="{StaticResource RepeatButtonTransparent}" />
+                        </Track.DecreaseRepeatButton>
+                        <Track.IncreaseRepeatButton>
+                            <RepeatButton Command="Slider.IncreaseLarge" Style="{StaticResource RepeatButtonTransparent}" />
+                        </Track.IncreaseRepeatButton>
+                        <Track.Thumb>
+                            <Thumb Width="20" Height="10"  x:Name="PART_Thumb"/>
+                        </Track.Thumb>
+                    </Track>
+                </Grid>
+                <ControlTemplate.Triggers>
+                    <Trigger Property="Orientation" Value="Vertical">
+                        <Setter TargetName="PART_TrackFilled" Property="Height">
+                            <Setter.Value>
+                                <MultiBinding Converter="{StaticResource SliderHeightConverter}">
+                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Value"/>
+                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="ActualHeight"/>
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter TargetName="PART_TrackRemaining" Property="Height">
+                            <Setter.Value>
+                                <MultiBinding Converter="{StaticResource SliderHeightConverter}" ConverterParameter="Remaining">
+                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Value"/>
+                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="ActualHeight"/>
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                    </Trigger>
+
+
+                </ControlTemplate.Triggers>
+
+
+            </ControlTemplate>
+
+            <!-- Style for Slider using the custom ControlTemplate -->
+            <Style x:Key="CustomSliderStyle" TargetType="Slider">
+                <Setter Property="Template" Value="{StaticResource CustomSliderTemplate}"/>
+            </Style>
+            
+            
         </ResourceDictionary>
     </Window.Resources>
 
@@ -105,16 +156,17 @@
             <Grid x:Name="MixContainer" d:IsLocked="False" Width="75" VerticalAlignment="Top" Margin="10,33,0,0" Height="327" HorizontalAlignment="Left">
                 <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" Height="179" VerticalAlignment="Top" Width="60" Background="#FF2C2F33" Margin="0,66,0,0">
                     <Slider x:Name="VolumeSlider"
-                            Style="{DynamicResource SliderStyle1}" 
+                            Style="{DynamicResource CustomSliderStyle}" 
                             HorizontalAlignment="Center" 
                             Margin="0,9,0,0" 
                             VerticalAlignment="Top" 
-                            Width="18" 
+                            Width="30" 
                             Height="150" 
                             Orientation="Vertical"
                             Minimum="0"
                             Maximum="100"
-                            Value="100"/>
+                            Value="100"
+                            />
                 </Border>
                 <Border CornerRadius="0,0,5,5" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" Height="26" Margin="0,244,0,0" VerticalAlignment="Top" Width="60">
                     <TextBlock x:Name="volCount" 
