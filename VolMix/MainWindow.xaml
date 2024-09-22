@@ -154,46 +154,58 @@
 
             <!-- Main Content -->
             <Grid x:Name="MixContainer" d:IsLocked="False" Width="75" VerticalAlignment="Top" Margin="10,33,0,0" Height="327" HorizontalAlignment="Left">
+                <Border x:Name="IconHead" CornerRadius="5,5,0,0" BorderBrush="Black" BorderThickness="1" Margin="0,7,0,260" Width="60" HorizontalAlignment="Center">
+                    <Grid>
+                        <Image x:Name="AppIcon" Margin="9,9,9,9"/>
+                        <Button x:Name="listButton" Content="+" 
+                    Click="listButton_Click"
+                    HorizontalAlignment="Center" 
+                    VerticalAlignment="Center" 
+                    Width="20" 
+                    Height="20" 
+                    Background="Transparent" 
+                    Foreground="White" 
+                    BorderBrush="Black" 
+                    BorderThickness="1" 
+            />
+                    </Grid>
+                </Border>
                 <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" Height="179" VerticalAlignment="Top" Width="60" Background="#FF2C2F33" Margin="0,66,0,0">
                     <Slider x:Name="VolumeSlider"
-                            Style="{DynamicResource CustomSliderStyle}" 
-                            HorizontalAlignment="Center" 
-                            Margin="0,9,0,0" 
-                            VerticalAlignment="Top" 
-                            Width="30" 
-                            Height="150" 
-                            Orientation="Vertical"
-                            Minimum="0"
-                            Maximum="100"
-                            Value="100"
-                            />
+                Style="{DynamicResource CustomSliderStyle}" 
+                HorizontalAlignment="Center" 
+                Margin="0,9,0,0" 
+                VerticalAlignment="Top" 
+                Width="30" 
+                Height="150" 
+                Orientation="Vertical"
+                Minimum="0"
+                Maximum="100"
+                Value="100"
+                ValueChanged="System_VolumeSlider_ValueChanged"
+        />
                 </Border>
                 <Border CornerRadius="0,0,5,5" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" Height="26" Margin="0,244,0,0" VerticalAlignment="Top" Width="60">
                     <TextBlock x:Name="volCount" 
-                               Text="{Binding ElementName=VolumeSlider, Path=Value, Converter={StaticResource IntegerPercentageConverter}}" 
-                               VerticalAlignment="Top" 
-                               HorizontalAlignment="Left" 
-                               Foreground="White" 
-                               FontSize="16" 
-                               TextAlignment="Center" 
-                               Width="50" Margin="5,0,0,0" />
+                   Text="{Binding ElementName=VolumeSlider, Path=Value, Converter={StaticResource IntegerPercentageConverter}}" 
+                   VerticalAlignment="Top" 
+                   HorizontalAlignment="Left" 
+                   Foreground="White" 
+                   FontSize="16" 
+                   TextAlignment="Center" 
+                   Width="50" Margin="5,0,0,0" />
                 </Border>
-                <Border CornerRadius="5,5,0,0" BorderBrush="Black" BorderThickness="1" Margin="0,7,0,260" Width="60" HorizontalAlignment="Center">
-                    <Image Margin="9,9,9,9"/>
-                </Border>
-
-                <!-- Add the Remove Button -->
                 <Button Content="Remove" 
-                        HorizontalAlignment="Center" 
-                        VerticalAlignment="Top" 
-                        Width="60" 
-                        Height="30" 
-                        Margin="0,280,0,0" 
-                        Background="#FF2C2F33" 
-                        Foreground="White" 
-                        BorderBrush="Black" 
-                        BorderThickness="1" 
-                        Click="RemoveButton_Click"/>
+            HorizontalAlignment="Center" 
+            VerticalAlignment="Top" 
+            Width="60" 
+            Height="30" 
+            Margin="0,280,0,0" 
+            Background="#FF2C2F33" 
+            Foreground="White" 
+            BorderBrush="Black" 
+            BorderThickness="1" 
+            Click="RemoveButton_Click"/>
             </Grid>
             <Border x:Name="MixerPane" BorderBrush="Black" BorderThickness="1" Margin="96,32,21,10" CornerRadius="5">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="0,0,0,-1">

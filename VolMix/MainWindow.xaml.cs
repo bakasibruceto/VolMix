@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 using System.Windows;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -9,54 +10,202 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using NAudio.CoreAudioApi;
+using AudioSwitcher.AudioApi;
+using System.Data;
+using System.Diagnostics;
+using System.Windows.Threading;
+using VolMix.EventHandlers;
 
 namespace VolMix
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
+
+
+        private MMDeviceEnumerator _deviceEnumerator;
+        private MMDevice? _defaultPlaybackDevice;
+        private MMDevice? _defaultDevice;
+        private AudioSessionControl? _currentSession;
+        private DispatcherTimer? _sessionCheckTimer;
+        private string? _selectedApplicationName;
+        private Slider? _selectedVolumeSlider;
+        private int? _selectedProcessId;
+
+
+
         public MainWindow()
         {
             InitializeComponent();
-        }
+            _deviceEnumerator = new MMDeviceEnumerator();
+            _defaultPlaybackDevice = _deviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, NAudio.CoreAudioApi.Role.Multimedia);
+            _currentSession = null;
+            _defaultDevice = _defaultPlaybackDevice;
 
-        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.WindowState = WindowState.Minimized;
-        }
-
-        private void MaximizeButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.WindowState == WindowState.Maximized)
+            // Get the system volume and set it to the VolumeSlider
+            if (_defaultDevice != null)
             {
-                this.WindowState = WindowState.Normal;
+                float systemVolume = _defaultDevice.AudioEndpointVolume.MasterVolumeLevelScalar * 100;
+                VolumeSlider.Value = systemVolume;
+            }
+
+            _sessionCheckTimer = new DispatcherTimer();
+        }
+
+        private void RefreshAudioSessions()
+        {
+            if (_defaultPlaybackDevice == null)
+            {
+                MessageBox.Show("Default playback device not found.");
+                return;
+            }
+
+            var sessions = _defaultPlaybackDevice.AudioSessionManager.Sessions;
+            // Update your UI or internal state with the new list of sessions
+            // For example, you can update a ListBox with the new sessions
+        }
+
+        private void System_VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (_defaultDevice != null)
+            {
+                _defaultDevice.AudioEndpointVolume.MasterVolumeLevelScalar = (float)(e.NewValue / 100.0);
+            }
+        }
+
+        private void listButton_Click(object sender, RoutedEventArgs e)
+        {
+            var listMessageBox = new ListMessageBox(this); // Pass the main window as the owner
+            if (listMessageBox.ShowDialog() == true)
+            {
+                string? selectedApp = listMessageBox.SelectedApplication;
+                if (!string.IsNullOrEmpty(selectedApp))
+                {
+                    if (sender is Button listButton && listButton.Tag is Tuple<Slider, Image> tag)
+                    {
+                        ConnectVolumeSliderToApplication(selectedApp, tag.Item1, tag.Item2);
+                    }
+                }
+            }
+        }
+
+
+        private void VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (_currentSession != null && _selectedProcessId.HasValue)
+            {
+                try
+                {
+                    var sessionProcess = Process.GetProcessById(_selectedProcessId.Value);
+                    if (sessionProcess != null && sessionProcess.ProcessName.Equals(_selectedApplicationName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        _currentSession.SimpleAudioVolume.Volume = (float)(e.NewValue / 100);
+                    }
+                    else
+                    {
+                        // If the process is no longer running, reset the current session
+                        ResetCurrentSession();
+                    }
+                }
+                catch (ArgumentException)
+                {
+                    // Process.GetProcessById throws ArgumentException if the process is not running
+                    ResetCurrentSession();
+                }
+                catch (Exception ex)
+                {
+                    // Log or handle other exceptions
+                    MessageBox.Show($"Error: {ex.Message}");
+                    ResetCurrentSession();
+                }
+            }
+        }
+
+        private void ConnectVolumeSliderToApplication(string applicationName, Slider volumeSlider, Image appIcon)
+        {
+            _selectedApplicationName = applicationName;
+            _selectedVolumeSlider = volumeSlider;
+
+            if (_defaultPlaybackDevice == null)
+            {
+                MessageBox.Show("Default playback device not found.");
+                return;
+            }
+
+            // Set the application icon
+            var icon = AudioHelper.GetApplicationIcon(applicationName);
+            if (icon != null)
+            {
+                appIcon.Source = icon;
+            }
+
+            // Set up the volume slider to update the application's volume once the session is found
+            _selectedVolumeSlider.ValueChanged += VolumeSlider_ValueChanged;
+
+            // Initialize the timer if it's null
+            if (_sessionCheckTimer == null)
+            {
+                _sessionCheckTimer = new DispatcherTimer();
+                _sessionCheckTimer.Interval = TimeSpan.FromSeconds(1); // Check every second
+                _sessionCheckTimer.Tick += CheckForAudioSession;
+            }
+
+            // Start the timer to check for audio sessions periodically
+            _sessionCheckTimer.Start();
+
+            CheckForAudioSession(null, null); // Initial check
+        }
+
+        private void CheckForAudioSession(object? sender, EventArgs? e)
+        {
+            if (_defaultPlaybackDevice == null || string.IsNullOrEmpty(_selectedApplicationName))
+            {
+                return;
+            }
+
+            var sessions = _defaultPlaybackDevice.AudioSessionManager.Sessions;
+            AudioSessionControl? session = null;
+
+            for (int i = 0; i < sessions.Count; i++)
+            {
+                var sessionControl = sessions[i];
+                var sessionProcess = Process.GetProcessById((int)sessionControl.GetProcessID);
+
+                if (sessionProcess != null && sessionProcess.ProcessName.Equals(_selectedApplicationName, StringComparison.OrdinalIgnoreCase))
+                {
+                    session = sessionControl;
+                    _selectedProcessId = sessionProcess.Id; // Store the process ID
+                    break;
+                }
+            }
+
+            if (session != null)
+            {
+                _currentSession = session;
+                if (_selectedVolumeSlider != null)
+                {
+                    _selectedVolumeSlider.Value = _currentSession.SimpleAudioVolume.Volume * 100;
+                }
             }
             else
             {
-                this.WindowState = WindowState.Maximized;
+                // If the session is not found, reset the current session
+                ResetCurrentSession();
             }
         }
 
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        private void ResetCurrentSession()
         {
-            this.Close();
+            _currentSession = null;
+            _selectedProcessId = null;
+            if (_selectedVolumeSlider != null)
+            {
+                _selectedVolumeSlider.Value = 0; // Optionally reset the slider value
+            }
         }
 
-        private void TitleBar_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ClickCount == 2)
-            {
-                // Handle double-click to maximize/restore
-                MaximizeButton_Click(sender, e);
-            }
-            else
-            {
-                // Handle drag move
-                this.DragMove();
-            }
-        }
+
+
 
         private void RemoveButton_Click(object sender, RoutedEventArgs e)
         {
@@ -67,10 +216,30 @@ namespace VolMix
             if (result)
             {
                 // Logic to handle the remove action
-                if (sender is Button removeButton && removeButton.Tag is Grid mixContainer)
+                if (sender is Button removeButton)
                 {
-                    MixerContainer.Children.Remove(mixContainer);
-                    MessageBox.Show("Item removed!");
+                    if (removeButton.Tag is Grid mixContainer)
+                    {
+                        // Detach event handlers
+                        if (_selectedVolumeSlider != null)
+                        {
+                            _selectedVolumeSlider.ValueChanged -= VolumeSlider_ValueChanged;
+                        }
+
+                        // Reset state
+                        ResetCurrentSession();
+
+                        MixerContainer.Children.Remove(mixContainer);
+                        MessageBox.Show("Item removed!");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Tag is not set correctly.");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Sender is not a Button.");
                 }
             }
             else
@@ -80,6 +249,7 @@ namespace VolMix
             }
         }
 
+
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
             // Create a new MixContainer Grid
@@ -87,26 +257,31 @@ namespace VolMix
             {
                 Width = 75,
                 VerticalAlignment = VerticalAlignment.Top,
-                Margin = new Thickness(0),
+                Margin = new Thickness(0, 0, 0, 0),
                 Height = 327,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                AllowDrop = true
+                HorizontalAlignment = HorizontalAlignment.Left
             };
 
-            // Add the inner elements to the new MixContainer
-            Border sliderBorder = new Border
+            // Create the IconHead Border
+            Border iconHead = new Border
             {
+                CornerRadius = new CornerRadius(5, 5, 0, 0),
                 BorderBrush = Brushes.Black,
                 BorderThickness = new Thickness(1),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                Height = 179,
-                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(0, 7, 0, 260),
                 Width = 60,
-                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF2C2F33")),
-                Margin = new Thickness(0, 66, 0, 0)
+                HorizontalAlignment = HorizontalAlignment.Center
             };
 
-            Slider slider = new Slider
+            // Create the Grid inside the IconHead Border
+            Grid iconGrid = new Grid();
+            Image appIcon = new Image
+            {
+                Margin = new Thickness(9, 9, 9, 9)
+            };
+
+            // Create the VolumeSlider
+            Slider volumeSlider = new Slider
             {
                 Style = (Style)FindResource("CustomSliderStyle"),
                 HorizontalAlignment = HorizontalAlignment.Center,
@@ -120,8 +295,42 @@ namespace VolMix
                 Value = 100
             };
 
-            sliderBorder.Child = slider;
+            // Create the listButton
+            Button listButton = new Button
+            {
+                Content = "+",
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Width = 20,
+                Height = 20,
+                Background = Brushes.Transparent,
+                Foreground = Brushes.White,
+                BorderBrush = Brushes.Black,
+                BorderThickness = new Thickness(1),
+                Tag = new Tuple<Slider, Image>(volumeSlider, appIcon) // Store the volumeSlider and appIcon in the Tag property
+            };
+            listButton.Click += listButton_Click;
 
+            iconGrid.Children.Add(appIcon);
+            iconGrid.Children.Add(listButton);
+            iconHead.Child = iconGrid;
+
+            // Create the VolumeSlider Border
+            Border sliderBorder = new Border
+            {
+                BorderBrush = Brushes.Black,
+                BorderThickness = new Thickness(1),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Height = 179,
+                VerticalAlignment = VerticalAlignment.Top,
+                Width = 60,
+                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF2C2F33")),
+                Margin = new Thickness(0, 66, 0, 0)
+            };
+
+            sliderBorder.Child = volumeSlider;
+
+            // Create the volCount Border
             Border labelBorder = new Border
             {
                 CornerRadius = new CornerRadius(0, 0, 5, 5),
@@ -136,7 +345,6 @@ namespace VolMix
 
             TextBlock volCount = new TextBlock
             {
-                Text = "100%",
                 VerticalAlignment = VerticalAlignment.Top,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 Foreground = Brushes.White,
@@ -146,25 +354,17 @@ namespace VolMix
                 Margin = new Thickness(5, 0, 0, 0)
             };
 
+            // Bind the TextBlock to the Slider's Value
+            Binding binding = new Binding("Value")
+            {
+                Source = volumeSlider,
+                Converter = (IValueConverter)FindResource("IntegerPercentageConverter")
+            };
+            volCount.SetBinding(TextBlock.TextProperty, binding);
+
             labelBorder.Child = volCount;
 
-            Border imageBorder = new Border
-            {
-                CornerRadius = new CornerRadius(5, 5, 0, 0),
-                BorderBrush = Brushes.Black,
-                BorderThickness = new Thickness(1),
-                Margin = new Thickness(0, 7, 0, 260),
-                Width = 60,
-                HorizontalAlignment = HorizontalAlignment.Center
-            };
-
-            Image image = new Image
-            {
-                Margin = new Thickness(9, 9, 9, 9)
-            };
-
-            imageBorder.Child = image;
-
+            // Create the Remove Button
             Button removeButton = new Button
             {
                 Content = "Remove",
@@ -177,21 +377,33 @@ namespace VolMix
                 Foreground = Brushes.White,
                 BorderBrush = Brushes.Black,
                 BorderThickness = new Thickness(1),
-                Tag = newMixContainer // Set the Tag to the MixContainer
+                Tag = newMixContainer // Store the newMixContainer in the Tag property
             };
-
             removeButton.Click += RemoveButton_Click;
 
-            // Add the borders and button to the new MixContainer
+            // Add the elements to the new MixContainer
+            newMixContainer.Children.Add(iconHead);
             newMixContainer.Children.Add(sliderBorder);
             newMixContainer.Children.Add(labelBorder);
-            newMixContainer.Children.Add(imageBorder);
             newMixContainer.Children.Add(removeButton);
 
             // Add the new MixContainer to the MixerContainer
             MixerContainer.Children.Add(newMixContainer);
         }
 
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
 
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void TitleBar_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            this.DragMove();
+        }
     }
 }
